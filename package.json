@@ -1,0 +1,41 @@
+{
+  "name": "aws-s3-object-multipart-copy",
+  "version": "0.0.0",
+  "description": "Copy large files in S3 using the AWS S3 Multipart API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc tape test.js"
+  },
+  "keywords": [
+    "aws",
+    "s3",
+    "object",
+    "multipart",
+    "copy"
+  ],
+  "author": "Joseph Werle <werle@littlestar.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk": "^2.678.0",
+    "cli-progress": "^3.8.2",
+    "mock-aws-s3": "^4.0.1",
+    "nyc": "^15.0.1",
+    "tape": "^5.0.0"
+  },
+  "dependencies": {
+    "batch": "^0.6.1",
+    "blake2b": "^2.1.3",
+    "debug": "^4.1.1",
+    "extend": "^3.0.2",
+    "mutexify": "^1.3.0",
+    "nanoassert": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/little-core-labs/aws-s3-object-multipart-copy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/little-core-labs/aws-s3-object-multipart-copy/issues"
+  },
+  "homepage": "https://github.com/little-core-labs/aws-s3-object-multipart-copy#readme"
+}
