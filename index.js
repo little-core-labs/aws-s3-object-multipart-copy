@@ -15,6 +15,12 @@ const os = require('os')
 const MAX_PARTS = 10000
 
 /**
+ * The maximum number of bytes per part in a multipart upload request.
+ * @private
+ */
+const MAX_PART_SIZE = 5 * 1000 * 1000 * 1000
+
+/**
  * An `Error` container for aborted sessions.
  * @class
  * @private
@@ -219,22 +225,22 @@ class MultipartUpload {
     await source.ready()
     await destination.ready()
 
-    let total = Math.ceil(source.contentLength / partSize) - 1
+    let total = Math.floor(source.contentLength / partSize)
 
-    if (total > MAX_PARTS) {
-      partSize = computePartSize(source.contentLength)
-      // recompute
-      total = Math.ceil(source.contentLength / partSize) - 1
+    if (source.contentLength > MAX_PART_SIZE) {
+      partSize = MAX_PART_SIZE
+      total = Math.floor(source.contentLength / MAX_PART_SIZE)
     }
 
+    this.partSize = partSize
     this.pending = total
     this.bucket = context.Bucket
     this.total = total
     this.key = context.Key
     this.id = context.UploadId
 
-    for (let i = 0; i < source.contentLength; i += partSize) {
-      this.upload(++partNumber, i)
+    for (let offset = 0; offset < source.contentLength; offset += partSize) {
+      this.upload(++partNumber, offset)
     }
   }
 
@@ -552,8 +558,9 @@ class Session extends EventEmitter {
               return
             }
 
-            if (err) { return release(reject, err) }
-            else {
+            if (err) {
+              return release(reject, err)
+            } else {
               release()
               resolve(this)
               await this.reset()
@@ -616,12 +623,12 @@ function hash(value) {
 }
 
 /**
- * Computes the partion size for a given byte size.
+ * Computes the partition size for a given byte size.
  * @param {Number} contentLength
  * @return {Number}
  */
-function computePartSize(contentLength) {
-  return Math.floor(contentLength / (MAX_PARTS - 1))
+function computePartSize(contentLength, max) {
+  return Math.floor(contentLength / ((max  || MAX_PARTS) - 1))
 }
 
 /**
