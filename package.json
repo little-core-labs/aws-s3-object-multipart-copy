@@ -17,8 +17,8 @@
   "license": "MIT",
   "devDependencies": {
     "aws-sdk": "^2.678.0",
+    "aws-sdk-mock": "^5.1.0",
     "cli-progress": "^3.8.2",
-    "mock-aws-s3": "^4.0.1",
     "nyc": "^15.0.1",
     "tape": "^5.0.0"
   },
