@@ -227,14 +227,10 @@ class MultipartUpload {
 
     let total = Math.floor(source.contentLength / partSize)
 
-    if (partSize > MAX_PART_SIZE) {
-      partSize = MAX_PART_SIZE
-      total = Math.floor(source.contentLength / MAX_PART_SIZE)
-    }
-
     if (total > MAX_PARTS) {
       partSize = computePartSize(source.contentLength)
-      total = Math.floor(source.contentLength / MAX_PART_SIZE)
+      // recompute
+      total = Math.ceil(source.contentLength / partSize) - 1
     }
 
     this.partSize = partSize
