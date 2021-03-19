@@ -258,6 +258,7 @@ class MultipartUpload {
     const { contentLength } = this.source
     const { s3 } = this.session
     const range = { start: 0, end: offset + partSize }
+    const { acl } = this.session.config
 
     if (offset > 0) {
       range.start = offset + 1
@@ -274,6 +275,7 @@ class MultipartUpload {
       UploadId: this.id,
       Bucket: this.destination.bucket,
       Key: this.destination.key,
+      ACL: acl
     }
 
     this.dispatch.push(async (next) => {
@@ -386,6 +388,14 @@ class Session extends EventEmitter {
   }
 
   /**
+   * The total number concurrent multipart chunk uploads.
+   * @static
+   * @accessor
+   * @type {Number}
+   */
+  static get DEFAULT_ACL() { return 'bucket-owner-full-control' }
+
+  /**
    * An object of defaults for the `Session` class constructor options `opts`
    * parameter.
    * @static
@@ -398,6 +408,7 @@ class Session extends EventEmitter {
       concurrency: this.DEFAULT_PART_CONCURRENCY,
       partSize: this.DEFAULT_PART_SIZE,
       retries: this.DEFAULT_MAX_RETRIES,
+      acl: this.DEFAULT_ACL
     }
   }
 
@@ -410,6 +421,7 @@ class Session extends EventEmitter {
    * @param {?(Number)} [opts.concurrency = Session.DEFAULT_PART_CONCURRENCY]
    * @param {?(Number)} [opts.partSize = Session.DEFAULT_PART_SIZE]
    * @param {?(Number)} [opts.retries = Session.DEFAULT_MAX_RETRIES]
+   * @param {?(String)} [opts.acl = Session.DEFAULT_ACL]
    */
   constructor(opts) {
     super()
@@ -431,6 +443,17 @@ class Session extends EventEmitter {
     assert('number' === typeof opts.sourceConcurrency && opts.sourceConcurrency >= 0,
       'Invalid argument for `opts.sourceConcurrency`. Expecting a number >= 0')
 
+    assert('string' === typeof opts.acl && [
+      'private',
+      'public-read',
+      'public-read-write',
+      'authenticated-read',
+      'aws-exec-read',
+      'bucket-owner-read',
+      'bucket-owner-full-control'
+    ].includes(opts.acl),
+      'Invalid argument for `opts.acl`. Expecting a valid acl string')
+
     this.s3 = opts.s3
     this.lock = mutex()
     this.queue = null
@@ -445,6 +468,7 @@ class Session extends EventEmitter {
       concurrency: opts.concurrency,
       partSize: opts.partSize,
       retries: opts.retries,
+      acl: opts.acl,
     }
 
     this.init()

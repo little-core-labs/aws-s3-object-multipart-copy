@@ -61,7 +61,8 @@ can be:
   s3: null, // an instance of `AWS.S3` <required>
   retries: 4, // number of max retries for failed uploads [optional]
   partSize: 5 * 1024 * 1024, // the default part size for all uploads in this session [optional]
-  concurrency: os.cpus().length * os.cpus().length // the upload concurrency [optional]
+  concurrency: os.cpus().length * os.cpus().length, // the upload concurrency [optional]
+  acl: 'bucket-owner-full-control' // the destination ACL
 }
 ```
 
