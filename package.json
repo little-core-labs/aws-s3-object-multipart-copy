@@ -1,6 +1,6 @@
 {
-  "name": "aws-s3-object-multipart-copy",
-  "version": "0.1.4",
+  "name": "@dla-vod/aws-s3-object-multipart-copy",
+  "version": "0.1.5",
   "description": "Copy large files in S3 using the AWS S3 Multipart API.",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "author": "Joseph Werle <werle@littlestar.com>",
   "license": "MIT",
   "devDependencies": {
-    "aws-sdk": "^2.678.0",
+    "aws-sdk": "^2.871.0",
     "aws-sdk-mock": "^5.1.0",
     "cli-progress": "^3.8.2",
     "nyc": "^15.0.1",

@@ -90,7 +90,7 @@ class Target {
    * `Target` class constructor.
    * @constructor
    * @param {Session} session
-   * @param {Object|String} opts
+   * @param {Object} opts
    * @param {String} opts.key
    * @param {String} opts.bucket
    */
@@ -156,7 +156,7 @@ class TargetStats {
     const { s3 } = this.session
     const params = { Bucket: this.target.bucket, Key: this.target.key }
     const head = await s3.headObject(params).promise()
-    this.contentLength = parseInt(head.ContentLength)
+    this.contentLength = head.ContentLength
   }
 }
 
@@ -199,6 +199,7 @@ class MultipartUpload {
     this.source = source
     this.pending = 0
     this.session = session
+    // @ts-ignore
     this.dispatch = source.dispatch
     this.progress = 0
     this.partSize = source.session.config.partSize
@@ -307,7 +308,7 @@ class MultipartUpload {
         try {
           debug('uploadPartCopy(%j)', params)
           const res = await s3.uploadPartCopy(params).promise()
-          const part = new Part(partNumber, res.ETag)
+          const part = new Part(partNumber, res.CopyPartResult.ETag)
           parts[partNumber - 1] = part
           return part
         } catch (err) {
@@ -348,7 +349,7 @@ class MultipartUpload {
  * The `Session` class is a container for a multipart copy request.
  * @class
  * @extends EventEmitter
- * @see {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#copyObject-property}
+ * @see https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#copyObject-property
  */
 class Session extends EventEmitter {
 
@@ -391,7 +392,7 @@ class Session extends EventEmitter {
    * The total number concurrent multipart chunk uploads.
    * @static
    * @accessor
-   * @type {Number}
+   * @type {String}
    */
   static get DEFAULT_ACL() { return 'bucket-owner-full-control' }
 
@@ -415,10 +416,11 @@ class Session extends EventEmitter {
   /**
    * `Session` class constructor.
    * @constructor
-   * @param {?(Object)} opts
+   * @param {Object} opts
    * @param {AWS.S3} opts.s3
    * @param {?(Function)} [opts.factory = MultipartUpload]
    * @param {?(Number)} [opts.concurrency = Session.DEFAULT_PART_CONCURRENCY]
+   * @param {?(Number)} [opts.sourceConcurrency = Session.DEFAULT_SOURCE_CONCURRENCY]
    * @param {?(Number)} [opts.partSize = Session.DEFAULT_PART_SIZE]
    * @param {?(Number)} [opts.retries = Session.DEFAULT_MAX_RETRIES]
    * @param {?(String)} [opts.acl = Session.DEFAULT_ACL]
@@ -426,6 +428,7 @@ class Session extends EventEmitter {
   constructor(opts) {
     super()
 
+    // @ts-ignore
     opts = extend(true, this.constructor.defaults, opts)
 
     assert(opts.s3 && 'object' === typeof opts.s3,
@@ -531,6 +534,7 @@ class Session extends EventEmitter {
 
     queue.push(async (next) => {
       try {
+        // @ts-ignore
         const multipart = new this.factory(this, source, destination)
         await multipart.init()
         next()

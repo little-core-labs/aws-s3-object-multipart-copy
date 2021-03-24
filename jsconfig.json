@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node"
+    },
+    "include": ["src/**/*", "index.js", "types"],
+    "exclude": [
+        "node_modules",
+        "**/node_modules/*"
+    ]
+}
